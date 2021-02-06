@@ -1,34 +1,17 @@
-import requests
 from player import Player
-
-def sort_by_points(e):
-    return e.goals + e.assists
+from player_reader import PlayerReader
+from player_stats import PlayerStats
 
 def main():
     url = "https://nhlstatisticsforohtu.herokuapp.com/players"
-    response = requests.get(url).json()
+    reader = PlayerReader(url)
+    
+    players = reader.get_players()
+    stats = PlayerStats(players)
 
-    players = []
+    finnish_top_scorers = stats.top_scorers_by_nationality('FIN')
 
-    for player_dict in response:
-        player = Player(
-            player_dict['name'],
-            player_dict['nationality'],
-            player_dict['assists'],
-            player_dict['goals'],
-            player_dict['penalties'],
-            player_dict['team'],
-            player_dict['games'],
-        )
-
-        if (player.nationality == "FIN"):
-            players.append(player)
-
-    players.sort(key=sort_by_points, reverse=True)
-
-    print("Oliot:")
-
-    for player in players:
+    for player in finnish_top_scorers:
         print(player)
 
 if __name__ == "__main__":
