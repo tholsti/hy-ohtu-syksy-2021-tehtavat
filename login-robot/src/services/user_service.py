@@ -1,11 +1,14 @@
 from entities.user import User
-
+import re
 
 class UserInputError(Exception):
     pass
 
 
 class AuthenticationError(Exception):
+    pass
+
+class RegistrationError(Exception):
     pass
 
 
@@ -37,4 +40,14 @@ class UserService:
         if not username or not password:
             raise UserInputError("Username and password are required")
 
-        # toteuta loput tarkastukset tänne ja nosta virhe virhetilanteissa
+        if self._user_repository.find_by_username(username):
+            raise RegistrationError("Username already exists")
+
+        if (not re.match('^[a-z]{3,}$', username)):
+            raise RegistrationError("Username is invalid")
+
+        if (not re.match('^[\S]{8,}$', password)):
+            raise RegistrationError("Password is too short")
+        
+        if (not re.search('[^a-z]$', password)):
+            raise RegistrationError("Password contains only letters")

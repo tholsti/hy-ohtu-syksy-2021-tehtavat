@@ -1,6 +1,6 @@
 class App:
-    def __init__(self, user_sevice, io):
-        self.user_sevice = user_sevice
+    def __init__(self, user_service, io):
+        self.user_service = user_service
         self.io = io
 
     def run(self):
@@ -14,7 +14,7 @@ class App:
                 (username, password) = self._read_credentials()
 
                 try:
-                    self.user_sevice.create_user(username, password)
+                    self.user_service.create_user(username, password)
                     self.io.write("New user registered")
                 except Exception as error:
                     self.io.write(str(error))
@@ -22,7 +22,7 @@ class App:
                 (username, password) = self._read_credentials()
 
                 try:
-                    self.user_sevice.check_credentials(username, password)
+                    self.user_service.check_credentials(username, password)
                     self.io.write("Logged in")
                 except Exception as error:
                     self.io.write(str(error))
