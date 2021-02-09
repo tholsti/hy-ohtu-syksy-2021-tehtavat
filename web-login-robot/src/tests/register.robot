@@ -1,5 +1,6 @@
 *** Settings ***
 Resource  resource.robot
+Resource  login_resource.robot
 Suite Setup  Open And Configure Browser
 Suite Teardown  Close Browser
 Test Setup  Reset Application And Go To Registration Form
@@ -24,6 +25,16 @@ Register With Nonmatching Password And Password Confirmation
     Fill Out Registration Form  ville  v123!  ville_123!
     Submit Registration Form
     Registration Should Fail With Message  Password and confirmation do not match
+
+Login After Successful Registration
+    Create User And Go To Login Page  ville  ville123
+    Log In With Username And Password  ville  ville123
+    Main Page Should Be Open
+
+Login After Failed Registration
+    Create User And Go To Login Page  ville  abc
+    Log In With Username And Password  ville  abc
+    Login Page Should Be Open
 
 
 *** Keywords ***
