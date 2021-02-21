@@ -32,3 +32,6 @@ class Kauppa:
 
     def get_tilinumero(self):
         return self._kaupan_tili
+
+    def get_ostoskori(self):
+        return self._ostoskori

@@ -41,17 +41,15 @@ class TestKauppa(unittest.TestCase):
 
         # alustetaan kauppa
         self.kauppa = Kauppa(self.varasto_mock, self.pankki_mock, self.viitegeneraattori_mock)
-
+        self.kauppa.aloita_asiointi()
     
     def test_ostoksen_paatyttya_pankin_metodia_tilisiirto_kutsutaan(self):
-        self.kauppa.aloita_asiointi()
         self.kauppa.lisaa_koriin(1)
         self.kauppa.tilimaksu(self.asiakas, self.asiakas_tilinumero)
 
         self.pankki_mock.tilisiirto.assert_called()
 
     def test_tilisiirtoa_kutsutuaan_oikeilla_parametreilla(self):
-        self.kauppa.aloita_asiointi()
         self.kauppa.lisaa_koriin(1)
         self.kauppa.tilimaksu(self.asiakas, self.asiakas_tilinumero)
 
@@ -60,7 +58,6 @@ class TestKauppa(unittest.TestCase):
         )
 
     def test_oikea_tilisiirto_kahdella_eri_tuotteella(self):
-        self.kauppa.aloita_asiointi()
         self.kauppa.lisaa_koriin(1)
         self.kauppa.lisaa_koriin(2)
         self.kauppa.tilimaksu(self.asiakas, self.asiakas_tilinumero)
@@ -70,7 +67,6 @@ class TestKauppa(unittest.TestCase):
         )
 
     def test_oikea_tilisiirto_kahdella_samalla_tuotteella(self):
-        self.kauppa.aloita_asiointi()
         self.kauppa.lisaa_koriin(1)
         self.kauppa.lisaa_koriin(1)
         self.kauppa.tilimaksu(self.asiakas, self.asiakas_tilinumero)
@@ -80,7 +76,6 @@ class TestKauppa(unittest.TestCase):
         )
 
     def test_puuttuvaa_tuotetta_ei_veloiteta(self):
-        self.kauppa.aloita_asiointi()
         self.kauppa.lisaa_koriin(1)
         self.kauppa.lisaa_koriin(3)
         self.kauppa.tilimaksu(self.asiakas, self.asiakas_tilinumero)
@@ -89,3 +84,28 @@ class TestKauppa(unittest.TestCase):
             self.asiakas, self.viitegeneraattori_mock.uusi(), self.asiakas_tilinumero, self.kauppa.get_tilinumero(), 5
         )
 
+    def test_pyydetaan_uusi_viite_jokaiseen_maksuun(self):
+        self.assertEqual(self.kauppa.get_ostoskori().hinta(), 0)
+        self.kauppa.lisaa_koriin(3)
+        self.kauppa.tilimaksu(self.asiakas, self.asiakas_tilinumero)
+        self.assertEqual(self.viitegeneraattori_mock.uusi.call_count, 1)
+
+        self.kauppa.aloita_asiointi()
+        self.assertEqual(self.kauppa.get_ostoskori().hinta(), 0)
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.tilimaksu(self.asiakas, self.asiakas_tilinumero)
+        self.assertEqual(self.viitegeneraattori_mock.uusi.call_count, 2)
+
+        self.kauppa.aloita_asiointi()
+        self.assertEqual(self.kauppa.get_ostoskori().hinta(), 0)
+        self.kauppa.lisaa_koriin(3)
+        self.kauppa.tilimaksu(self.asiakas, self.asiakas_tilinumero)
+        self.assertEqual(self.viitegeneraattori_mock.uusi.call_count, 3)
+
+    def test_korista_poistaminen_onnistuu(self):
+        self.assertEqual(self.kauppa.get_ostoskori().hinta(), 0)
+        self.kauppa.lisaa_koriin(1)
+        self.assertEqual(self.kauppa.get_ostoskori().hinta(), 5)
+        self.kauppa.poista_korista(1)
+        self.assertEqual(self.kauppa.get_ostoskori().hinta(), 0)
+        
