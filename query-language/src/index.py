@@ -7,10 +7,18 @@ def main():
     reader = PlayerReader(url)
     stats = Statistics(reader)
 
-    query_builder = QueryBuilder()
-    query = query_builder.playsIn("NYR").hasAtLeast(5, 'goals').build()
+    query = QueryBuilder()
+    matcher = query.oneOf(
+      query.playsIn("PHI")
+          .hasAtLeast(10, "assists")
+          .hasFewerThan(5, "goals")
+          .build(),
+      query.playsIn("EDM")
+          .hasAtLeast(40, "points")
+          .build()
+    )
 
-    for player in stats.matches(query):
+    for player in stats.matches(matcher):
         print(player)
 
 if __name__ == "__main__":

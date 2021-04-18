@@ -74,5 +74,9 @@ class QueryBuilder:
     def hasAtLeast(self, value, attr):
         return QueryBuilder(And(self._query, HasAtLeast(value, attr)))
     
+    def oneOf(self, *queries):
+        return Or(*queries)
+
+    
     def build(self):
         return self._query
